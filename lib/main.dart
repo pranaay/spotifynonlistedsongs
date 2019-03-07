@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
-
+import 'package:http/http.dart' as http;
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final wordPair = WordPair.random();
     return MaterialApp(
       title: 'FML',
       home: RandomWords(),
@@ -47,6 +46,11 @@ class RandomWordsState extends State<RandomWords> {
   }
 
   Widget _buildRow(WordPair pair) {
+    var tokens = new Map();
+    tokens = {"Accept": "application/json" , "Content-Type": "application/json" , "Authorization": "Bearer BQAgItb-wsabeWI0EWpsFc0wcWLujcxDvBZUUm4Vp_9-jWWNAbMO6vtffSQ7L9JBKSdb_jzggLFN3K841jI_Kthng38uY6A_szP1dzGwat1vtXYK9ZIMctN_EF6GzPaNHt_x8QmRZubQMk_qVAoSBrMO1j1Zt0-ln-nEYp00pKWpEUa8vHdYnjJgYNVKnJdSXVQf4UPyyDSyPgiI6W1UarTx"};
+    var url = "https://api.spotify.com/v1/playlists/2r8mbGkYcMDAYVByKDhsSp?market=IN&fields=tracks.items(track(name%2Cis_playable))";
+    http.get(url,headers: tokens );
+
     return ListTile(
       title: Text(
         pair.asPascalCase,
