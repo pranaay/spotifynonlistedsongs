@@ -27,7 +27,9 @@ class _MyListScreenState extends State {
   _getSongs() {
     Api.getSongs().then((response) {
       setState(() {
-        Iterable list = json.decode(response.body);
+        Map l = json.decode(response.body);
+        Map ll = l["tracks"];
+        Iterable list = ll['items'];
         songs = list.map((model) => Songs.fromJson(model)).toList();
       });
     });
@@ -75,16 +77,16 @@ class _MyListScreenState extends State {
 //        });
 //  }
 
-  Widget _buildRow(WordPair pair) {
-
-
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-    );
-  }
+//  Widget _buildRow(WordPair pair) {
+//
+//
+//    return ListTile(
+//      title: Text(
+//        pair.asPascalCase,
+//        style: _biggerFont,
+//      ),
+//    );
+//  }
 }
 //var tokens = new Map<String,String>();
 
@@ -120,9 +122,9 @@ class Songs{
     this.is_available = i;
   }
 
-  Songs.fromJson(Map json)
-      : name = json['tracks']['items']['track']['name'],
-        is_available = json['tracks']['items']['track']['is_playable'];
+  Songs.fromJson(Map<String, dynamic> json)
+      : name = json['track']['name'],
+        is_available = json['track']['is_playable'];
 
   Map toJson(){
     return {"name" : name , "is_available" : is_available};
