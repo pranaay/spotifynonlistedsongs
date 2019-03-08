@@ -63,51 +63,27 @@ class _MyListScreenState extends State {
         },
       ));
   }
-//  Widget _buildSuggestions() {
-//    return ListView.builder(
-//        padding: const EdgeInsets.all(16.0),
-//        itemBuilder: /*1*/ (context, i) {
-//          if (i.isOdd) return Divider(); /*2*/
-//
-//          final index = i ~/ 2; /*3*/
-//          if (index >= _suggestions.length) {
-//            _suggestions.addAll(generateWordPairs().take(10)); /*4*/
-//          }
-//          return _buildRow(_suggestions[index]);
-//        });
-//  }
 
-//  Widget _buildRow(WordPair pair) {
-//
-//
-//    return ListTile(
-//      title: Text(
-//        pair.asPascalCase,
-//        style: _biggerFont,
-//      ),
-//    );
-//  }
 }
-//var tokens = new Map<String,String>();
 
-Map<String, String> tokens = {"Accept": "application/json" , "Content-Type": "application/json" , "Authorization": "Bearer BQAJlxUReJ1LVA-jgihc3vEg7xDZG4QJrVFYU7x9Vhai5KoQ8qKloc26giihcWq0aCDYoEl9GajxviMPpInjI0Alp5eTnXaylRs-7OdARQaDTGTtF_fGC0DPsxZV69-z_2k12lnzPIF-WJVPfz9mM59tKwSeweV5wY286zCxPROKiWfLG0ge6QVelIP81TvkGSTG6ZJJ-IveRsmM5MynQrqb"};
+Map<String, String> tokens = {"Accept": "application/json" , "Content-Type": "application/json" };
 var url = "https://api.spotify.com/v1/playlists/2r8mbGkYcMDAYVByKDhsSp?market=IN&fields=tracks.items(track(name%2Cis_playable))";
 //final response =  http.get(url,headers: tokens );
 
 
 class Api {
-  static Future getSongs(){
+  static Future getSongs() async{
+    Map<String, String> to = {'Authorization': 'Basic <put in your token>'};
+    var body_params = {'grant_type' : 'client_credentials'};
+
+    var ur = "https://accounts.spotify.com/api/token";
+    var reso = await http.post(ur,headers: to,body: body_params);
+    Map toko = jsonDecode(reso.body);
+    tokens["Authorization"]="Bearer " + toko["access_token"];
+
+
+
     var response =  http.get(url,headers: tokens );
-//    response.then((response) {
-////      json.
-////      response.body
-//      String jss = json.decode(response.body);
-//      Map<String,dynamic> js =  jsonDecode(response.body);
-//      js = js['tracks'];
-//      js = js['items'];
-//
-//      debugPrint(response.body);
-//    });
 
     return response;
   }
