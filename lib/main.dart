@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -24,15 +23,19 @@ class MyListScreen extends StatefulWidget {
 class _MyListScreenState extends State {
   var songs = new List<Songs>();
   final _biggerFont = const TextStyle(fontSize: 18.0);
+
   _getSongs() {
-    Api.getSongs().then((response) {
+    Api.getSongs("2r8mbGkYcMDAYVByKDhsSp","IN").then((response) {
       setState(() {
         Map l = json.decode(response.body);
-        Map ll = l["tracks"];
-        Iterable list = ll['items'];
+        Iterable list = l['tracks']['items'];
         songs = list.map((model) => Songs.fromJson(model)).toList();
       });
     });
+  }
+
+  _getPlaylists(){
+
   }
 
   @override
@@ -41,6 +44,7 @@ class _MyListScreenState extends State {
     super.initState();
     _getSongs();
   }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -49,8 +53,6 @@ class _MyListScreenState extends State {
 
   @override
   Widget build(BuildContext context)  {
-
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Unavailable songs'),
@@ -67,24 +69,38 @@ class _MyListScreenState extends State {
 }
 
 Map<String, String> tokens = {"Accept": "application/json" , "Content-Type": "application/json" };
-var url = "https://api.spotify.com/v1/playlists/2r8mbGkYcMDAYVByKDhsSp?market=IN&fields=tracks.items(track(name%2Cis_playable))";
-//final response =  http.get(url,headers: tokens );
-
+//var url = "https://api.spotify.com/v1/playlists/2r8mbGkYcMDAYVByKDhsSp?market=IN&fields=tracks.items(track(name%2Cis_playable))";
 
 class Api {
-  static Future getSongs() async{
-    Map<String, String> to = {'Authorization': 'Basic <put in your token>'};
-    var body_params = {'grant_type' : 'client_credentials'};
 
+  static Future getSongs(String playlisturi,String country) async{
+    // get new OAuth token
+    Map<String, String> to = {'Authorization': 'Basic <put in your own>'};
+    var body_params = {'grant_type' : 'client_credentials'};
     var ur = "https://accounts.spotify.com/api/token";
     var reso = await http.post(ur,headers: to,body: body_params);
     Map toko = jsonDecode(reso.body);
-    tokens["Authorization"]="Bearer " + toko["access_token"];
+    //set new OAuth token
+    tokens["Authorization"]="Bearer " +toko["access_token"];
 
-
-
+    String url = "https://api.spotify.com/v1/playlists/" +  playlisturi.toString() + "?market=" + country.toString() + "&fields=tracks.items(track(name%2Cis_playable))" ;
+    //Get get response
     var response =  http.get(url,headers: tokens );
+    return response;
+  }
 
+  static Future getPlaylists(String useruri) async{
+    // get new OAuth token
+    Map<String, String> to = {'Authorization': 'Basic <put in your own>'};
+    var body_params = {'grant_type' : 'client_credentials'};
+    var ur = "https://accounts.spotify.com/api/token";
+    var reso = await http.post(ur,headers: to,body: body_params);
+    Map toko = jsonDecode(reso.body);
+    //set new OAuth token
+    tokens["Authorization"]="Bearer " +toko["access_token"];
+
+    String url = "https://api.spotify.com/v1/users/" + useruri.toString() +"/playlists";
+    var response = http.get(url,headers: tokens);
     return response;
   }
 }
@@ -105,5 +121,10 @@ class Songs{
   Map toJson(){
     return {"name" : name , "is_available" : is_available};
   }
+
+}
+
+class Playlists{
+  String name;
 
 }
