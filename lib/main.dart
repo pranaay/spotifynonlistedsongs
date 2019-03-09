@@ -22,6 +22,7 @@ class MyListScreen extends StatefulWidget {
 
 class _MyListScreenState extends State {
   var songs = new List<Songs>();
+  var playlists = new List<Playlists>();
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   _getSongs() {
@@ -35,7 +36,15 @@ class _MyListScreenState extends State {
   }
 
   _getPlaylists(){
-
+    Api.getPlaylists("f68lmzo7ouo9skhuaiojbq2ne").then((response){
+      setState(() {
+        Map l = json.decode(response.body);
+        Iterable list = l["items"];
+        playlists = list.map((model) => Playlists.fromJson(model)).toList();
+        debugPrint(response.body);
+      });
+    });
+    
   }
 
   @override
@@ -43,6 +52,7 @@ class _MyListScreenState extends State {
     // TODO: implement initState
     super.initState();
     _getSongs();
+    _getPlaylists();
   }
 
   @override
@@ -58,10 +68,10 @@ class _MyListScreenState extends State {
         title: Text('Unavailable songs'),
       ),
       body: ListView.builder(
-        itemCount: songs.length,
+        itemCount: playlists.length*2,
         itemBuilder: (context, index) {
           if(index.isOdd) return Divider();
-          else return ListTile(title: Text(songs[index].name));
+          else return ListTile(title: Text(playlists[index ~/ 2].name));
         },
       ));
   }
@@ -75,7 +85,7 @@ class Api {
 
   static Future getSongs(String playlisturi,String country) async{
     // get new OAuth token
-    Map<String, String> to = {'Authorization': 'Basic <put in your own>'};
+    Map<String, String> to = {'Authorization': 'Basic <add your own>'};
     var body_params = {'grant_type' : 'client_credentials'};
     var ur = "https://accounts.spotify.com/api/token";
     var reso = await http.post(ur,headers: to,body: body_params);
@@ -91,7 +101,7 @@ class Api {
 
   static Future getPlaylists(String useruri) async{
     // get new OAuth token
-    Map<String, String> to = {'Authorization': 'Basic <put in your own>'};
+    Map<String, String> to = {'Authorization': 'Basic <add your own>'};
     var body_params = {'grant_type' : 'client_credentials'};
     var ur = "https://accounts.spotify.com/api/token";
     var reso = await http.post(ur,headers: to,body: body_params);
@@ -126,5 +136,19 @@ class Songs{
 
 class Playlists{
   String name;
+  String uri;
 
+  Playlists(String n, String u){
+    this.name = n;
+    this.uri = u;
+  }
+
+  Playlists.fromJson(Map<String, dynamic> json)
+          : name = json["name"],
+            uri = json["id"];
+
+  Map toJson(){
+    return {"name" : name, "uri" : uri};
+  }
+  
 }
